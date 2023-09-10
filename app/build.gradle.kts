@@ -51,7 +51,8 @@ android {
 }
 
 dependencies {
-    implementation(fileTree(baseDir = "../libs") {
+    // add easylink libraries
+    implementation(fileTree(baseDir = "../libs/easylink") {
         include("*.jar")
     })
     implementation(libs.gson)
