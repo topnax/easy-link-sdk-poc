@@ -6,27 +6,16 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.lifecycleScope
 import com.kralst.m50test.card.CardReader
 import com.kralst.m50test.m50.EasyLinkCardReader
 import com.kralst.m50test.m50.EasyLinkSdk
 import com.kralst.m50test.ui.screens.main.MainScreen
 import com.kralst.m50test.ui.screens.main.MainScreenViewModel
 import com.kralst.m50test.ui.theme.M50TestTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.math.BigDecimal
-import java.util.Date
-
-private inline val log get() = Timber.tag("main-activity")
 
 class MainActivity : ComponentActivity() {
 
@@ -55,46 +44,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-    private fun readCard() {
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                runCatching {
-
-                    val connected = easyLinkSdk.connect()
-
-                    if (!connected) {
-                        log.e("EasyLink failed to connect")
-                        return@runCatching
-                    }
-
-                    val cardReaderResult = cardReader.startSaleTransaction(
-                        amount = BigDecimal("10.30"),
-                        date = Date()
-                    )
-
-                    log.d("cardReaderResult = $cardReaderResult")
-
-                }.onFailure {
-                    log.e(it)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!", modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    M50TestTheme {
-        Greeting("Android")
     }
 }

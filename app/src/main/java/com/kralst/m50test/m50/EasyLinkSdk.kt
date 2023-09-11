@@ -22,6 +22,7 @@ class EasyLinkSdk(
 
     private fun connectOnM50(): Boolean {
         // TODO doesn't work when an external connect request is not made
+        //  and connect returns -108
 
         // taken from the EasyLink SDK sample application:
         val uartParam = UartParam()
