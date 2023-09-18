@@ -13,34 +13,39 @@ object EasyLinkConstants {
 }
 
 class EasyLinkSdk(
-    private val context: Context
+    context: Context
 ) {
     private val easyLinkSdkManager = EasyLinkSdkManager.getInstance(context)
+
+    val neptuneDal = NeptuneLiteUser.getInstance().getDal(context)
 
     // TODO support other models than M50
     fun connect() = connectOnM50()
 
     private fun connectOnM50(): Boolean {
-        // TODO doesn't work when an external connect request is not made
-        //  and connect returns -108
+        // it is required to wake up the R20 before connecting
+        neptuneDal.paymentDevice.wakeup()
 
-        // taken from the EasyLink SDK sample application:
-        val uartParam = UartParam()
-        uartParam.port = EUartPort.COM19
-        val iComm =
-            NeptuneLiteUser
-                .getInstance()
-                .getDal(context).commManager.getUartComm(uartParam)
+        // setup IComm implementation for R20
+        // (taken from the EasyLink SDK sample application)
+        val iComm = neptuneDal.commManager.getUartComm(
+            UartParam().apply {
+                port = EUartPort.COM19
+            }
+        )
 
         val uartComm = UartComm(iComm)
 
         val connectTimeoutMillis = 10 * 1000
-        return easyLinkSdkManager.connect(uartComm, connectTimeoutMillis) == EasyLinkConstants.RESULT_CONNECTED
+        return easyLinkSdkManager.connect(
+            uartComm,
+            connectTimeoutMillis
+        ) == EasyLinkConstants.RESULT_CONNECTED
     }
 
-    fun <T> use(action: EasyLinkSdkManager.() -> T)  =
-       easyLinkSdkManager.action()
+    fun <T> use(action: EasyLinkSdkManager.() -> T) =
+        easyLinkSdkManager.action()
 
-    suspend fun <T> useSuspend(action: suspend EasyLinkSdkManager.() -> T)  =
+    suspend fun <T> useSuspend(action: suspend EasyLinkSdkManager.() -> T) =
         easyLinkSdkManager.action()
 }
