@@ -10,12 +10,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.kralst.m50test.card.CardReader
+import com.kralst.m50test.card.MifareMCardReader
 import com.kralst.m50test.m50.EasyLinkCardReader
+import com.kralst.m50test.m50.EasyLinkMifareMCardReader
 import com.kralst.m50test.m50.EasyLinkSdk
 import com.kralst.m50test.ui.screens.main.MainScreen
 import com.kralst.m50test.ui.screens.main.MainScreenViewModel
 import com.kralst.m50test.ui.theme.M50TestTheme
-import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
 
@@ -27,9 +28,15 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    private val mifareMCardReader: MifareMCardReader by lazy {
+        EasyLinkMifareMCardReader(
+            easyLinkSdk = easyLinkSdk
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val mainScreenViewModel = MainScreenViewModel(easyLinkSdk, cardReader)
+        val mainScreenViewModel = MainScreenViewModel(easyLinkSdk, cardReader, mifareMCardReader)
         setContent {
             M50TestTheme {
                 // A surface container using the 'background' color from the theme

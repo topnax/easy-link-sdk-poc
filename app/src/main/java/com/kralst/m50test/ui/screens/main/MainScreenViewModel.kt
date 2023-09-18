@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kralst.m50test.card.CardReader
 import com.kralst.m50test.card.CardReaderResult
+import com.kralst.m50test.card.MifareMCardReader
 import com.kralst.m50test.m50.EasyLinkSdk
 import com.kralst.m50test.ui.screens.main.MainScreenContract.Event
 import com.kralst.m50test.ui.screens.main.MainScreenContract.State
@@ -20,6 +21,7 @@ import java.util.Date
 class MainScreenViewModel(
     private val easyLinkSdk: EasyLinkSdk,
     private val cardReader: CardReader,
+    private val mifareMCardReader: MifareMCardReader,
 ) : ViewModel() {
 
     private var _state = MutableStateFlow(State())
@@ -32,9 +34,35 @@ class MainScreenViewModel(
             is Event.AmountChanged -> onAmountChanged(event)
             Event.ErrorsDismissed -> onErrorsDismissed()
             is Event.TransactionStartRequested -> onTransactionStartRequested(event)
+            is Event.MifareMCardReadRequested -> onMifareMReadRequested(event)
             Event.CardReadResultDismissed -> onCardReadResultDismissed()
         }
         Timber.d("State after event processing: ${state.value}")
+    }
+
+    private fun onMifareMReadRequested(event: Event) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                _state.update {
+                    it.copy(
+                        transactionInProgress = true
+                    )
+                }
+
+                if (!easyLinkSdk.connect()) {
+                    processCardReadError("Couldn't connect to the SDK.")
+                    return@withContext
+                }
+
+                val result = mifareMCardReader.read()
+
+                _state.update {
+                    it.copy(
+                        transactionInProgress = false
+                    )
+                }
+            }
+        }
     }
 
     private fun onCardReadResultDismissed() {

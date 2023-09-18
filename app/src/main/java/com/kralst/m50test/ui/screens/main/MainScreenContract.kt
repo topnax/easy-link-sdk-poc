@@ -4,6 +4,8 @@ import com.kralst.m50test.card.CardReaderResult
 
 interface MainScreenContract {
     sealed interface Event {
+        object MifareMCardReadRequested : Event
+
         data class TransactionStartRequested(
             val amountInput: String
         ) : Event

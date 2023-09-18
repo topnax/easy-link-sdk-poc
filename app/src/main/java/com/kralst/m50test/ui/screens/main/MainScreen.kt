@@ -88,16 +88,31 @@ private fun TransactionSetupSection(
         })
     )
 
-    Button(onClick = {
-        onEvent(
-            Event.TransactionStartRequested(
-                amountInput = state.amountInput
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(onClick = {
+            onEvent(
+                Event.TransactionStartRequested(
+                    amountInput = state.amountInput
+                )
             )
-        )
-    }) {
-        Text(
-            "Start transaction"
-        )
+        }) {
+            Text(
+                "Start transaction"
+            )
+        }
+
+        // add a button to read a Mifare M card
+        Button(onClick = {
+            onEvent(
+                Event.MifareMCardReadRequested
+            )
+        }) {
+            Text(
+                "Read Mifare card"
+            )
+        }
     }
 }
 
